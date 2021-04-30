@@ -2,6 +2,7 @@
 #include <Wire.h>
 #define MPU 0x68
 //Veriler
+//Gyro
 int iX ,iY ,iZ , IsI , GyX , GyY ,GyZ;
 //Motor Hız ve yön ayarı için değişkenler
 int ena = 3;
@@ -10,9 +11,10 @@ int in2 = 5;
 int in3 = 6;
 int in4 = 7;
 int enb = 9;
-int enaSpeed = 255;
-int enbSpeed = 255;
-int blVerb;
+int enaSpeed = 0;
+int enbSpeed = 0;
+//Bluetooth
+char blVerb;
 // Tek birkez döndürülecek döngü
 void setup(){
 //Gyro İçin gerekli
@@ -38,80 +40,56 @@ void loop(){
 //Bluetooth verileri al 
 blVerb = Serial.read();
 Serial.println(blVerb);
-  //ileri
-  if(blVerb == 49){
-  digitalWrite(ena , HIGH);
-  digitalWrite(in1 , HIGH);
-  digitalWrite(in2 , LOW);
-  digitalWrite(in3 , HIGH);
-  digitalWrite(in4 , LOW);
-  digitalWrite(enb , HIGH);
-  }
-  //Geri
-  if(blVerb == 50){
-  digitalWrite(ena , HIGH);
-  digitalWrite(in1 , LOW);
-  digitalWrite(in2 , HIGH);
-  digitalWrite(in3 , LOW);
-  digitalWrite(in4 , HIGH);
-  digitalWrite(enb , HIGH);
-  }
-  //Sağ
-  if(blVerb == 51){
-  digitalWrite(ena , HIGH);
-  digitalWrite(in1 , HIGH);
-  digitalWrite(in2 , LOW);
-  digitalWrite(in3 , LOW);
-  digitalWrite(in4 , HIGH);
-  digitalWrite(enb , HIGH);
-  }
-  //Sol
-  if(blVerb == 52){
-  digitalWrite(ena , HIGH);
-  digitalWrite(in1 , LOW);
-  digitalWrite(in2 , HIGH);
-  digitalWrite(in3 , HIGH);
-  digitalWrite(in4 , LOW);
-  digitalWrite(enb , HIGH);
-  }
+Motordrive();
 }
+//Fonksiyon
 void Motordrive(){
-  /*İleri*/
-  if(blVerb == 49){
-  digitalWrite(ena , HIGH);
+/*İleri*/
+if(blVerb == 'A'){
+  analogWrite(ena , enaSpeed);
+  digitalWrite(in1 , HIGH);
+  digitalWrite(in2 , LOW);
+  digitalWrite(in3 , HIGH);
+  digitalWrite(in4 , LOW);
+  analogWrite(enb , enbSpeed);
+}
+/*Geri*/
+if(blVerb == 'B'){
+  analogWrite(ena , enaSpeed);
+  digitalWrite(in1 , LOW);
+  digitalWrite(in2 , HIGH);
+  digitalWrite(in3 , LOW);
+  digitalWrite(in4 , HIGH);
+  analogWrite(enb , enbSpeed);
+}
+/*Sağ*/
+if(blVerb == 'C'){
+  analogWrite(ena , enaSpeed);
   digitalWrite(in1 , LOW);
   digitalWrite(in2 , HIGH);
   digitalWrite(in3 , HIGH);
   digitalWrite(in4 , LOW);
-  digitalWrite(enb , HIGH);
- }
-  /*Geri*/
-  if(blVerb == 50){
-  digitalWrite(ena , HIGH);
+  analogWrite(enb , enbSpeed);
+}
+/*Sol*/
+if(blVerb == 'D'){
+  analogWrite(ena , enaSpeed);
   digitalWrite(in1 , HIGH);
-  digitalWrite(in2 , HIGH);
-  digitalWrite(in3 , HIGH);
+  digitalWrite(in2 , LOW);
+  digitalWrite(in3 , LOW);
   digitalWrite(in4 , HIGH);
-  digitalWrite(enb , HIGH);
- }
- /*Sağ*/
- if(blVerb == 51){
-  digitalWrite(ena , HIGH);
-  digitalWrite(in1 , HIGH);
-  digitalWrite(in2 , HIGH);
-  digitalWrite(in3 , HIGH);
-  digitalWrite(in4 , HIGH);
-  digitalWrite(enb , HIGH);
- }
- /*Sol*/
- if(blVerb == 52){
-  digitalWrite(ena , HIGH);
-  digitalWrite(in1 , HIGH);
-  digitalWrite(in2 , HIGH);
-  digitalWrite(in3 , HIGH);
-  digitalWrite(in4 , HIGH);
-  
-  digitalWrite(enb , HIGH);
+  analogWrite(enb , enbSpeed);
+}
+//Hız Ver
+if(enaSpeed < 255 & enbSpeed < 255 & blVerb == 'E'){
+  enaSpeed = enaSpeed + 51;
+  enbSpeed = enbSpeed + 51;
+}
+//Hızı Düşür
+if(enaSpeed > 0 & enbSpeed > 0 & blVerb == 'F'){
+  enaSpeed = enaSpeed - 51;
+  enbSpeed = enbSpeed - 51;     
+}
   }
 /*Gyro
 Wire.beginTransmission(MPU);
@@ -138,5 +116,4 @@ GyZ = Wire.read()<<8|Wire.read();
 //Serial.print(GyY);
 //Serial.print("/Gyro Z :"); 
 //Serial.print(GyZ);
-Serial.println("");*/--9622
-}
+Serial.println("");*/
