@@ -1,4 +1,6 @@
 //Kütüphaneler
+#include<SoftwareSerial.h>
+SoftwareSerial myblue(10,11);//RX/TX
 #include <Wire.h>
 #define MPU 0x68
 //Veriler
@@ -17,6 +19,9 @@ int enbSpeed = 0;
 char blVerb;
 // Tek birkez döndürülecek döngü
 void setup(){
+//Serial Haberleşmeyi Başlat
+Serial.begin(9600);
+myblue.begin(9600);
 //Gyro İçin gerekli
 Wire.begin();
 Wire.beginTransmission(MPU);
@@ -30,21 +35,17 @@ pinMode(in2 , OUTPUT);
 pinMode(in3 , OUTPUT);
 pinMode(in4 , OUTPUT);
 pinMode(enb , OUTPUT);
-if(Serial.available() > 0){
-Serial.println("GO");
-}
-//Serial Haberleşmeyi Başlat
-Serial.begin(9600);
 }                                                                                                                      
 void loop(){
-//Bluetooth verileri al 
-blVerb = Serial.read();
-Serial.println(blVerb);
 Motordrive();
 }
 //Fonksiyon
 void Motordrive(){
+//Bluetooth verileri al 
+blVerb = myblue.read();
+Serial.println(blVerb);
 /*İleri*/
+
 if(blVerb == 'A'){
   analogWrite(ena , enaSpeed);
   digitalWrite(in1 , HIGH);
