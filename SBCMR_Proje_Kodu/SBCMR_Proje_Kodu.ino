@@ -1,33 +1,46 @@
 //Kütüphaneler
 #include<SoftwareSerial.h>
 SoftwareSerial myblue(10,11);//RX/TX
-#include <Wire.h>
-#define MPU 0x68
+//#include <Wire.h>
+//#define MPU 0x68
+
 //Veriler
+
 //Gyro
-int iX ,iY ,iZ , IsI , GyX , GyY ,GyZ;
+//int iX ,iY ,iZ , IsI , GyX , GyY ,GyZ;
+
 //Motor Hız ve yön ayarı için değişkenler
-int ena = 3;
-int in1 = 4;
-int in2 = 5;
-int in3 = 6;
-int in4 = 7;
-int enb = 9;
+#define ena A0
+#define in1 2
+#define in2 3
+#define in3 4
+#define in4 5
+#define enb A1
+#define lightL 8
+#define lightR 9
+
 int enaSpeed = 0;
 int enbSpeed = 0;
+
+//Light-On-Off
+bool L = false;
+bool R = false;
+
 //Bluetooth
 char blVerb;
+
 // Tek birkez döndürülecek döngü
 void setup(){
 //Serial Haberleşmeyi Başlat
 Serial.begin(9600);
-myblue.begin(9600);
+myblue.begin(9600); 
+
 //Gyro İçin gerekli
-Wire.begin();
+/*Wire.begin();
 Wire.beginTransmission(MPU);
 Wire.write(0x6B);
 Wire.write(0);
-Wire.endTransmission(true);
+Wire.endTransmission(true);*/
 //Motor sürücü kontrol pinleri
 pinMode(ena , OUTPUT);
 pinMode(in1 , OUTPUT);
@@ -35,17 +48,35 @@ pinMode(in2 , OUTPUT);
 pinMode(in3 , OUTPUT);
 pinMode(in4 , OUTPUT);
 pinMode(enb , OUTPUT);
-}                                                                                                                      
+pinMode(lightL , OUTPUT);
+pinMode(lightR , OUTPUT);
+}                  
+                                                                                                    
 void loop(){
 Motordrive();
+lights();
+blVerb =  ' ';
 }
-//Fonksiyon
+
+//Fonksiyonlar
+
+void lights(){
+  if(blVerb == 'L'){
+  bool L = !L;
+  digitalWrite(lightL , L);
+ }
+ if(blVerb == 'R'){
+  bool R = !R;
+  digitalWrite(lightR , R);
+ }
+  }
+
 void Motordrive(){
 //Bluetooth verileri al 
 blVerb = myblue.read();
 Serial.println(blVerb);
-/*İleri*/
 
+/*İleri*/
 if(blVerb == 'A'){
   analogWrite(ena , enaSpeed);
   digitalWrite(in1 , HIGH);
@@ -54,6 +85,7 @@ if(blVerb == 'A'){
   digitalWrite(in4 , LOW);
   analogWrite(enb , enbSpeed);
 }
+
 /*Geri*/
 if(blVerb == 'B'){
   analogWrite(ena , enaSpeed);
@@ -63,6 +95,7 @@ if(blVerb == 'B'){
   digitalWrite(in4 , HIGH);
   analogWrite(enb , enbSpeed);
 }
+
 /*Sağ*/
 if(blVerb == 'C'){
   analogWrite(ena , enaSpeed);
@@ -72,6 +105,7 @@ if(blVerb == 'C'){
   digitalWrite(in4 , LOW);
   analogWrite(enb , enbSpeed);
 }
+
 /*Sol*/
 if(blVerb == 'D'){
   analogWrite(ena , enaSpeed);
@@ -81,6 +115,7 @@ if(blVerb == 'D'){
   digitalWrite(in4 , HIGH);
   analogWrite(enb , enbSpeed);
 }
+
 //Hız Ver
 if(enaSpeed < 255 & enbSpeed < 255 & blVerb == 'E'){
   enaSpeed = enaSpeed + 51;
@@ -90,8 +125,15 @@ if(enaSpeed < 255 & enbSpeed < 255 & blVerb == 'E'){
 if(enaSpeed > 0 & enbSpeed > 0 & blVerb == 'F'){
   enaSpeed = enaSpeed - 51;
   enbSpeed = enbSpeed - 51;     
+ }
+ delay(1000);
+ 
+/*Gücü Kes*/
+  digitalWrite(in1 , LOW);
+  digitalWrite(in2 , LOW);
+  digitalWrite(in3 , LOW);
+  digitalWrite(in4 , LOW);
 }
-  }
 /*Gyro
 Wire.beginTransmission(MPU);
 Wire.write(0x3B); // ilk sensör verisi adresi
@@ -117,4 +159,5 @@ GyZ = Wire.read()<<8|Wire.read();
 //Serial.print(GyY);
 //Serial.print("/Gyro Z :"); 
 //Serial.print(GyZ);
-Serial.println("");*/
+Serial.println("");
+*/
